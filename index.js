@@ -1,27 +1,17 @@
-const fs = require('fs');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql');
+const bodyParser = require('body-parser');``
 const jsonwebtoken = require('jsonwebtoken');
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
-const data = fs.readFileSync('./database.json');
-const conf = JSON.parse(data);
+const connection = require("./database")
 
 //router
 const accountRouter = require('./routes/account.js');
 const commentRouter = require('./routes/comment.js');
 const postRouter = require('./routes/post.js');
-
-const connection = mysql.createConnection({
-    host : conf.host,
-    user : conf.user,
-    password : conf.password,
-    database : conf.database
-});
 
 const helmet = require('helmet')
 app.use(helmet())

@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+const conn = require('../database')
+
 router.get('/', function (req,res) {
     try {
         
