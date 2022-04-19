@@ -52,7 +52,8 @@ app.post('/login', async function(req, res) {
     try {
         const user_id = req.body === undefined ? req.user_id : req.body.user_id
         const user_pw = req.body === undefined ? req.user_pw : req.body.user_pw
-        //DB 에서 검색 코드
+
+        //DB 에서 검색 유저 ID 검색
         connection.query(
             `select * from user_table where vId="${user_id}"`,
             (err,rows,fields) => {
@@ -62,9 +63,9 @@ app.post('/login', async function(req, res) {
                 }
 
                 let user = rows[0]
-                crypto.pbkdf2(user_pw, user.vSalt, 100000, 64, 'sha512', (err, key) => {
+                crypto.pbkdf2(user_pw, user.vSalt, 100000, 64, 'sha512', (err, key) => { //salt 이용해 암호화
                     if(key.toString('base64') === user.vPwd) {
-                        let token = jsonwebtoken.sign({
+                        let token = jsonwebtoken.sign({ //jwt 생성
                                 user_id:user.vId,
                             },
                             'jjh',
@@ -74,7 +75,7 @@ app.post('/login', async function(req, res) {
                                 subject:'userInfo'
                             }
                         )
-                        res.send({
+                        res.send({ ///토큰 반환
                             "token":token,
                         })
                     } else {
