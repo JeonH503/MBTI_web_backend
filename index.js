@@ -25,26 +25,26 @@ app.use('/comment',commentRouter);
 app.use('/post',postRouter);
 
 //인증 미들웨어
-//app.use(function (req, res, next) {
-    //if (req.path !== '/login' && req.headers.authorization && req.headers.authorization !== 'undefined') {
-    //    req.headers.authorization = req.headers.authorization.replace('Bearer ','');
-    //    const token = req.headers.authorization;
-    //    jwt.verify(token, 'jjh', (err) => {
-    //        if (err) {
-    //            res.status(401).json({ err: '유효하지 않는 토큰입니다.' });
-    //        } else {
-    //            next();
-    //        }
-    //    });
-    //}
-    //예외 처리 고민 필요
-    //else if(req.path === '/login' || req.path.indexOf('.jpg') > -1 || req.path.indexOf('.png') > -1 || req.path.indexOf('uploads') > -1 || req.path.indexOf('license_check') > -1){ //예외처리
-    //    next()
-    //}  
-    //else {
-    //    res.status(401).json({ err: '유효하지 않는 토큰입니다.' });
-    //}
-//});
+app.use(function (req, res, next) {
+    if (req.path !== '/login' && req.headers.authorization && req.headers.authorization !== 'undefined') {
+       req.headers.authorization = req.headers.authorization.replace('Bearer ','');
+       const token = req.headers.authorization;
+       jwt.verify(token, 'jjh', (err) => {
+           if (err) {
+               res.status(401).json({ err: '유효하지 않는 토큰입니다.' });
+           } else {
+               next();
+           }
+       });
+    }
+    // 예외 처리 고민 필요
+    else if(req.path === '/login'){ //예외처리
+       next()
+    }  
+    else {
+       res.status(401).json({ err: '유효하지 않는 토큰입니다.' });
+    }
+});
 
 
 //로그인
