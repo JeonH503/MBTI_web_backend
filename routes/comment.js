@@ -6,7 +6,7 @@ const conn = require("../database");
 router.get("/", function (req, res) {
   try {
     let per_page = req.query.per_page; //페이지당 표시할 내용 갯수
-    let page = req.query.page - 1; //페이지
+    let page = req.query.page - 1;
 
     var sql = `select * from comment limit ${per_page * page},${per_page}`;
     conn.query(sql, function (err, rows, fields) {
