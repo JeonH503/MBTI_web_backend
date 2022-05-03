@@ -45,16 +45,11 @@ app.use(function (req, res, next) {
       }
     });
   } else if (req.method === "GET" || req.path === "/login") {
-    //예외처리
     next();
   } else {
     res.status(401).json({ err: "유효하지 않는 토큰입니다." });
   }
 });
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 
 //로그인
 app.post("/login", async function (req, res) {
