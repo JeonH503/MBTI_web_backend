@@ -54,7 +54,7 @@ app.post('/login', async function(req, res) {
         connection.query(
             `select * from user_table where vId="${user_id}"`,
             (err,rows,fields) => {
-                if(rows.length === 0) {
+                if(!rows) {
                     res.status(400).send({err:"존재하지 않는 계정입니다"})
                     return 0;
                 }
