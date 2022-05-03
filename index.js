@@ -36,12 +36,9 @@ app.use(function (req, res, next) {
                next();
            }
        });
-    }
-    // 예외 처리 고민 필요
-    else if(req.path === '/login'){ //예외처리
-       next()
-    }  
-    else {
+    } else if(req.method === "GET"){ //예외처리
+        next()
+    }  else {
        res.status(401).json({ err: '유효하지 않는 토큰입니다.' });
     }
 });
