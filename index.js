@@ -51,6 +51,10 @@ app.use(function (req, res, next) {
     res.status(401).json({ err: "유효하지 않는 토큰입니다." });
   }
 });
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 //로그인
 app.post("/login", async function (req, res) {
