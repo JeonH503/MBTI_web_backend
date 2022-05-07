@@ -29,11 +29,11 @@ router.post("/", function (req, res) {
   try {
     const id = req.params.id;
     var post_id = req.body.post_id;
-    var user_id = req.body.user_id;
+    var account_id = req.body.account_id;
     var description = req.body.description;
     var created_at = req.body.created_at;
 
-    var sql = `insert into comment(post_id, user_id, description, created_at) values(${post_id}, '${user_id}', '${description}', now());`;
+    var sql = `insert into comment(post_id, account_id, description, created_at) values(${post_id}, '${account_id}', '${description}', now());`;
 
     conn.query(sql, (err, rows, fields) => {
       res.send("posted");

@@ -35,10 +35,8 @@ router.get("/:id", async function (req, res) {
 
 router.post("/", function (req, res) {
   try {
-    const id = req.params.id;
     let board_name = req.body.board_name;
     let account_id = req.body.account_id;
-    let created_at = req.body.created_at; //now 설정으로 처리 필요
     let description = req.body.description;
 
     let sql = `insert into post(board_name, account_id, created_at, description) values('${board_name}', '${account_id}', now(), '${description}');`;
