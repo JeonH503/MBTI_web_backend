@@ -19,6 +19,12 @@ router.get("/", function (req, res) {
         `;
 
     conn.query(sql, (err, rows, fields) => {
+
+      if(err) {
+        res.status(400).send({err})
+        return 0;
+      }
+
       res.send(rows);
     });
   } catch (err) {
@@ -42,6 +48,12 @@ router.post("/", function (req, res) {
     let sql = `insert into post(board_name, account_id, created_at, description) values('${board_name}', '${account_id}', now(), '${description}');`;
 
     conn.query(sql, (err, rows, fields) => {
+
+      if(err) {
+        res.status(400).send({err})
+        return 0;
+      }
+      
       res.send("posted");
     });
   } catch (err) {
