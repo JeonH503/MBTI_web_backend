@@ -48,8 +48,14 @@ router.post("/", function (req, res) {
         res.status(400).send({ err });
         return 0;
       } else {
-        res.send(`post_id : ${post_id}
-        account_id : '${account_id}'`);
+        res.send(`{"result" : "성공"}
+
+        "comment"
+        {
+          "post_id" : ${post_id},
+          "account_id" : '${account_id}'
+        }
+        `);
       }
     });
   } catch (err) {
