@@ -95,8 +95,10 @@ app.post("/login", async function (req, res) {
                 }
                 );
                 res.send({
-                ///토큰 반환
-                token: token,
+                  ///토큰 반환
+                  token: token,
+                  id: user.id,
+                  mbti: user.mbti
                 });
             } else {
                 res.status(400).send({ err: "존재하지 않는 계정입니다" });
