@@ -10,11 +10,13 @@ router.get("/", function (req, res) {
     let search = req.query.search; //검색 내용
     let per_page = req.query.per_page; //페이지당 표시할 내용 갯수
     let page = req.query.page - 1; //페이지
+    let mbti = req.query.mbti.toLowerCase()
 
     let sql = `
-            select *
+            select SQL_CALC_FOUND_ROWS *
             from post
-            ${search ? `where ${search_type} = '%${search}%'` : ""}
+            where board_name = "${mbti}"
+            ${search ? `AND ${search_type} = '%${search}%'` : ""}
             limit ${per_page * page},${per_page}
         `;
 
@@ -25,7 +27,14 @@ router.get("/", function (req, res) {
         return 0;
       }
 
-      res.send(rows);
+      let posts = rows;
+
+      conn.query('SELECT FOUND_ROWS();', (err, rows, fields) => {
+        res.send({
+          data : posts,
+          count : rows[0]['FOUND_ROWS()']
+        });
+      })
     });
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
@@ -64,6 +73,12 @@ router.post("/", function (req, res) {
 router.patch("/:id", async function (req, res) {
   try {
     const id = req.params.id;
+
+    if(typeof(id) !== 'number') {
+      res.status(400).send({ err : "잘못된 값입니다" })
+    }
+
+
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }

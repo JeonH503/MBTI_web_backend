@@ -10,7 +10,14 @@ router.get("/", function (req, res) {
 
     var sql = `select * from comment limit ${per_page * page},${per_page}`;
     conn.query(sql, function (err, rows, fields) {
-      res.send(rows);
+
+      let comments = rows;
+      conn.query('SELECT FOUND_ROWS()', (err, rows, fields) => {
+        res.send({
+          data:comments,
+          count:rows[0]['FOUND_ROWS()']
+        });
+      })
     });
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
