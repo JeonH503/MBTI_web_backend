@@ -1,19 +1,11 @@
 var express = require("express");
 var router = express.Router();
 
+const crypto = require("crypto");
 const conn = require("../database");
 
 router.get("/", function (req, res) {
   try {
-    var sql = "select * from account";
-    conn.query(sql, function (err, rows, fields) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }
@@ -27,20 +19,33 @@ router.get("/:id", async function (req, res) {
 });
 
 router.post("/", function (req, res) {
-  try {
-    var id = req.body.id;
-    var mbti = req.body.mbti;
-    var salt = req.body.salt;
-    var password = req.body.password;
+    try {
+        let id = String(req.body.id);
+        let password = String(req.body.password);
+        let mbti = String(req.body.mbti);
+        let salt = "";
 
-    var sql = `insert into account(id, mbti, salt, password) values('${id}', '${mbti}', '${salt}', '${password}');`;
+        if(!id && !password && !mbti)
+            res.status(400).send("잘못된 형식입니다")
 
-    conn.query(sql, (err, rows, fields) => {
-      res.send("posted");
-    });
-  } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
-  }
+        crypto.randomBytes(64, (err, buf) => {
+            crypto.pbkdf2(password, buf.toString('base64'), 100000, 64, 'sha512', (err, key) => {
+                let incoded_password = key.toString('base64');
+                salt = buf.toString('base64');
+                let sql = `INSERT INTO account(id, mbti, salt, password) VALUES ('${id}','${mbti}','${salt}','${incoded_password}')`
+                
+                conn.query(sql, (err, rows, fields) => {
+                    if(err) {
+                        res.status(400).send({ err })
+                    }
+
+                    res.status(201).send("ok");
+                })
+            });
+        });  
+    } catch (err) {
+        res.status(400).send({ err });
+    }
 });
 
 router.patch("/:id", async function (req, res) {

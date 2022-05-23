@@ -15,6 +15,7 @@ const commentRouter = require("./routes/comment.js");
 const postRouter = require("./routes/post.js");
 
 const helmet = require("helmet");
+
 app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -33,18 +34,23 @@ app.use(function (req, res, next) {
     req.headers.authorization !== "undefined"
   ) {
     req.headers.authorization = req.headers.authorization.replace(
-      "Bearer ",
-      ""
+        "Bearer ",
+        ""
     );
     const token = req.headers.authorization;
-    jwt.verify(token, "jjh", (err) => {
-      if (err) {
-        res.status(401).json({ err: "유효하지 않는 토큰입니다." });
-      } else {
-        next();
-      }
+    jsonwebtoken.verify(token, "jjh", (err) => {
+        if (err) {
+                res.status(401).json({ err: "유효하지 않는 토큰입니다." });
+        } else {
+                next();
+        }
     });
-  } else if (req.method === "GET" || req.path === "/login") {
+  } else if (
+        (req.method !== "GET" && req.path === '/accoint') ||
+        req.method === "GET" || 
+        req.path === "/login" || 
+        (req.path === "/account" && req.method === "POST")
+    ) {
     next();
   } else {
     res.status(401).json({ err: "유효하지 않는 토큰입니다." });
@@ -54,41 +60,49 @@ app.use(function (req, res, next) {
 //로그인
 app.post("/login", async function (req, res) {
   try {
-    const user_id = req.body === undefined ? req.user_id : req.body.user_id;
-    const user_pw = req.body === undefined ? req.user_pw : req.body.user_pw;
+    const account_id = req.body === undefined ? req.account_id : req.body.account_id;
+    const account_pw = req.body === undefined ? req.account_pw : req.body.account_pw;
 
     //DB 에서 검색 유저 ID 검색
     connection.query(
-      `select * from user_table where vId="${user_id}"`,
+      `select * from account where id="${account_id}"`,
       (err, rows, fields) => {
-        if (!rows) {
+        if (!rows.length) {
           res.status(400).send({ err: "존재하지 않는 계정입니다" });
           return 0;
         }
 
         let user = rows[0];
-        crypto.pbkdf2(user_pw, user.vSalt, 100000, 64, "sha512", (err, key) => {
+        crypto.pbkdf2(account_pw, user.salt, 100000, 64, "sha512", (err, key) => {
+
+            if(err) {
+                res.status(400).send({ err: err });
+                return 0;
+            }
+
           //salt 이용해 암호화
-          if (key.toString("base64") === user.vPwd) {
-            let token = jsonwebtoken.sign(
-              {
-                //jwt 생성
-                user_id: user.vId,
-              },
-              "jjh",
-              {
-                expiresIn: "7d",
-                issuer: "koolsign_access_control",
-                subject: "userInfo",
-              }
-            );
-            res.send({
-              ///토큰 반환
-              token: token,
-            });
-          } else {
-            res.status(400).send({ err: "존재하지 않는 계정입니다" });
-          }
+            if (key.toString("base64") === user.password) {
+                let token = jsonwebtoken.sign(
+                {
+                    //jwt 생성
+                    account_id: user.id,
+                },
+                "jjh",
+                {
+                    expiresIn: "7d",
+                    issuer: "koolsign_access_control",
+                    subject: "userInfo",
+                }
+                );
+                res.send({
+                  ///토큰 반환
+                  token: token,
+                  id: user.id,
+                  mbti: user.mbti
+                });
+            } else {
+                res.status(400).send({ err: "존재하지 않는 계정입니다" });
+            }
         });
       }
     );
