@@ -16,14 +16,23 @@ router.get("/", function (req, res) {
     order by IF(ISNULL(parent_comment_id), id, parent_comment_id) 
     limit ${per_page * page},${per_page}`;
     conn.query(sql, function (err, rows, fields) {
-
-      let comments = rows;
-      conn.query('SELECT FOUND_ROWS()', (err, rows, fields) => {
-        res.send({
-          data:comments,
-          count:rows[0]['FOUND_ROWS()']
+      if (err) {
+        res.status(400).send({ err });
+        return 0;
+      } else {
+        let comments = rows;
+        conn.query("SELECT FOUND_ROWS()", (err, rows, fields) => {
+          if (err) {
+            res.status(400).send({ err });
+            return 0;
+          } else {
+            res.send({
+              data: comments,
+              count: rows[0]["FOUND_ROWS()"],
+            });
+          }
         });
-      })
+      }
     });
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
@@ -33,6 +42,16 @@ router.get("/", function (req, res) {
 router.get("/:id", async function (req, res) {
   try {
     const id = req.params.id;
+
+    var sql = `select * from comment where id=${id};`;
+    conn.query(sql, function (err, rows, fields) {
+      if (err) {
+        res.status(400).send({ err });
+        return 0;
+      } else {
+        res.send({ data: rows });
+      }
+    });
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }
@@ -53,14 +72,26 @@ router.post("/", function (req, res) {
         res.status(400).send({ err });
         return 0;
       } else {
-        res.send(`{"result" : "성공"}
+        var sql = `select last_insert_id();`;
 
-        "comment"
-        {
-          "post_id" : ${post_id},
-          "account_id" : '${account_id}'
-        }
-        `);
+        conn.query(sql, function (err, rows, fields) {
+          if (err) {
+            res.status(400).send({ err });
+            return 0;
+          } else {
+            var last_insert_id = Object.values(rows[0]);
+            var sql = `select * from comment where id=${last_insert_id};`;
+
+            conn.query(sql, function (err, rows, fields) {
+              if (err) {
+                res.status(400).send({ err });
+                return 0;
+              } else {
+                res.send({ post: { result: "성공" }, comment: rows });
+              }
+            });
+          }
+        });
       }
     });
   } catch (err) {
@@ -80,7 +111,16 @@ router.patch("/:id", async function (req, res) {
         res.status(400).send({ err });
         return 0;
       } else {
-        res.send("patched");
+        var sql = `select id, post_id, account_id, description from comment where id=${id};`;
+
+        conn.query(sql, function (err, rows, fields) {
+          if (err) {
+            res.status(400).send({ err });
+            return 0;
+          } else {
+            res.send({ patch: { result: "성공" }, comment: rows });
+          }
+        });
       }
     });
   } catch (err) {
@@ -92,6 +132,17 @@ router.delete("/:id", async function (req, res) {
   try {
     const id = req.params.id;
 
+    var sql = `select * from comment where id=${id};`;
+
+    conn.query(sql, function (err, rows, fields) {
+      if (err) {
+        res.status(400).send({ err });
+        return 0;
+      } else {
+        data = rows;
+      }
+    });
+
     var sql = `delete from comment where id=${id};`;
 
     conn.query(sql, (err, rows, fields) => {
@@ -99,7 +150,7 @@ router.delete("/:id", async function (req, res) {
         res.status(400).send({ err });
         return 0;
       } else {
-        res.send("deleted");
+        res.send({ delete: { result: "성공" }, comment: data });
       }
     });
   } catch (err) {
