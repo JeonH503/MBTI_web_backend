@@ -1,4 +1,5 @@
 var express = require("express");
+const { send } = require("express/lib/response");
 var router = express.Router();
 
 const conn = require("../database");
@@ -10,7 +11,7 @@ router.get("/", function (req, res) {
     let search = req.query.search; //검색 내용
     let per_page = req.query.per_page; //페이지당 표시할 내용 갯수
     let page = req.query.page - 1; //페이지
-    let mbti = req.query.mbti.toLowerCase()
+    let mbti = req.query.mbti.toLowerCase();
 
     let sql = `
             select SQL_CALC_FOUND_ROWS *
@@ -21,20 +22,19 @@ router.get("/", function (req, res) {
         `;
 
     conn.query(sql, (err, rows, fields) => {
-
-      if(err) {
-        res.status(400).send({err})
+      if (err) {
+        res.status(400).send({ err });
         return 0;
       }
 
       let posts = rows;
 
-      conn.query('SELECT FOUND_ROWS();', (err, rows, fields) => {
+      conn.query("SELECT FOUND_ROWS();", (err, rows, fields) => {
         res.send({
-          data : posts,
-          count : rows[0]['FOUND_ROWS()']
+          data: posts,
+          count: rows[0]["FOUND_ROWS()"],
         });
-      })
+      });
     });
   } catch (err) {
     res.status(400).send({ err });
@@ -57,13 +57,12 @@ router.post("/", function (req, res) {
     let sql = `insert into post(board_name, account_id, created_at, description) values('${board_name}', '${account_id}', now(), '${description}');`;
 
     conn.query(sql, (err, rows, fields) => {
-
-      if(err){
-        res.status(400).send({err})
+      if (err) {
+        res.status(400).send({ err });
       }
-      
-      res.status(200).send({msg:"ok"});
-    })
+
+      res.status(200).send({ msg: "ok" });
+    });
   } catch (err) {
     res.status(400).send({ err });
   }
@@ -82,19 +81,36 @@ router.patch("/:id", async function (req, res) {
     set description='${description}' ,
     board_name = '${board_name}'
     where id=${id}
-    and account_id='${account_id}';`
+    and account_id='${account_id}';`;
 
     conn.query(sql, (err, rows, fields) => {
-
-      if(err){
-        res.status(400).send({err})
+      if (err) {
+        res.status(400).send({ err });
       }
-      
-      res.status(200).send({msg:"ok"});
-    })
 
+      res.status(200).send({ msg: "ok" });
+    });
   } catch (err) {
     res.status(400).send({ err });
+  }
+});
+
+//좋아요
+router.patch("/like/:id", async function (req, res) {
+  try {
+    const id = req.params.id;
+
+    var sql = `update post set likes = likes+1 where id = ${id};`;
+    conn.query(sql, function (err, rows, fields) {
+      if (err) {
+        res.status(400).send({ err });
+        return 0;
+      } else {
+        res.send({ patch: { result: "성공" } });
+      }
+    });
+  } catch (err) {
+    res.status(400).send({ err: "잘못된 형식 입니다." });
   }
 });
 
@@ -106,16 +122,15 @@ router.delete("/:id", async function (req, res) {
     delete
     from post
     where id = ${id}
-    `
+    `;
 
     conn.query(sql, (err, rows, fields) => {
-
-      if(err){
-        res.status(400).send({err})
+      if (err) {
+        res.status(400).send({ err });
       }
-      
-      res.status(200).send({msg:"ok"});
-    })
+
+      res.status(200).send({ msg: "ok" });
+    });
   } catch (err) {
     res.status(400).send({ err });
   }
