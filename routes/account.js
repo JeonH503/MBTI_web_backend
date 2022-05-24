@@ -6,6 +6,10 @@ const conn = require("../database");
 
 router.get("/", function (req, res) {
   try {
+    // sql = 'select(id,mbti) from account'
+    // conn.query(sql, (err,rows,fields) => {
+
+    // })
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }
@@ -13,6 +17,17 @@ router.get("/", function (req, res) {
 
 router.get("/:id", async function (req, res) {
   try {
+    const id = req.params.id
+
+    let sql = `select id,mbti from account where id = '${id}'`
+
+    conn.query(sql, (err,rows,fields) => {
+      if(err) {
+        res.status(400).send({err})
+      }
+
+      res.send(rows)
+    })
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }
@@ -62,7 +77,6 @@ router.patch("/:id", async function (req, res) {
         crypto.pbkdf2(password, buf.toString('base64'), 100000, 64, 'sha512', (err, key) => {
             let incoded_password = key.toString('base64');
             salt = buf.toString('base64');
-            let sql = `INSERT INTO account(id, mbti, salt, password) VALUES ('${id}','${mbti}','${salt}','${incoded_password}')`
             let sql = `
             update
             from account
@@ -86,7 +100,17 @@ router.patch("/:id", async function (req, res) {
 
 router.delete("/:id", async function (req, res) {
   try {
-    
+    const id = req.params.id;
+    console.log(id)
+    sql = `delete from account where id = '${id}'`
+
+    conn.query(sql, (err, rows, fields) => {
+      if(err) {
+        res.status(400).send({err})
+      }
+
+      res.status(200).send('ok')
+    })
   } catch (err) {
     res.status(400).send({ err: "잘못된 형식 입니다." });
   }
