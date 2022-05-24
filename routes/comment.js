@@ -9,9 +9,12 @@ router.get("/", function (req, res) {
     let page = req.query.page - 1;
     let post_id = req.query.post_id;
 
-    var sql = `select * from comment where post_id=${post_id} limit ${
-      per_page * page
-    },${per_page}`;
+    var sql = `
+    select * 
+    from comment 
+    where post_id=${post_id}
+    order by IF(ISNULL(parent_comment_id), id, parent_comment_id) 
+    limit ${per_page * page},${per_page}`;
     conn.query(sql, function (err, rows, fields) {
       if (err) {
         res.status(400).send({ err });

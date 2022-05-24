@@ -37,14 +37,14 @@ router.get("/", function (req, res) {
       })
     });
   } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
+    res.status(400).send({ err });
   }
 });
 
 router.get("/:id", async function (req, res) {
   try {
   } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
+    res.status(400).send({ err });
   }
 });
 
@@ -58,15 +58,14 @@ router.post("/", function (req, res) {
 
     conn.query(sql, (err, rows, fields) => {
 
-      if(err) {
+      if(err){
         res.status(400).send({err})
-        return 0;
       }
       
-      res.send("posted");
-    });
+      res.status(200).send({msg:"ok"});
+    })
   } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
+    res.status(400).send({ err });
   }
 });
 
@@ -74,21 +73,51 @@ router.patch("/:id", async function (req, res) {
   try {
     const id = req.params.id;
 
-    if(typeof(id) !== 'number') {
-      res.status(400).send({ err : "잘못된 값입니다" })
-    }
+    let account_id = req.body.account_id;
+    let board_name = req.body.board_name;
+    let description = req.body.description;
 
+    let sql = `
+    update post 
+    set description='${description}' ,
+    board_name = '${board_name}'
+    where id=${id}
+    and account_id='${account_id}';`
+
+    conn.query(sql, (err, rows, fields) => {
+
+      if(err){
+        res.status(400).send({err})
+      }
+      
+      res.status(200).send({msg:"ok"});
+    })
 
   } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
+    res.status(400).send({ err });
   }
 });
 
 router.delete("/:id", async function (req, res) {
   try {
     const id = req.params.id;
+
+    let sql = `
+    delete
+    from post
+    where id = ${id}
+    `
+
+    conn.query(sql, (err, rows, fields) => {
+
+      if(err){
+        res.status(400).send({err})
+      }
+      
+      res.status(200).send({msg:"ok"});
+    })
   } catch (err) {
-    res.status(400).send({ err: "잘못된 형식 입니다." });
+    res.status(400).send({ err });
   }
 });
 
