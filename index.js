@@ -46,7 +46,7 @@ app.use(function (req, res, next) {
         }
     });
   } else if (
-        (req.method !== "GET" && req.path === '/accoint') ||
+        (req.method !== "GET" && req.path === '/account') ||
         req.method === "GET" || 
         req.path === "/login" || 
         (req.path === "/account" && req.method === "POST")
