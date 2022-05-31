@@ -53,13 +53,13 @@ router.get("/:id", async function (req, res) {
         return 0;
       }else{
         res.send({post : rows});
-        let sql = `update post set views = views + 1`;
+        let sql = `update post set views = views + 1 where id = ${id}`;
         conn.query(sql,(err,rows,fields)=>{
           if(err){
             res.status(400).send({err})
             return 0;
           }else{
-            console.log({update : { result: "성공" }});
+            console.log({views_update : { result: "성공" }});
           }
         });
       }
