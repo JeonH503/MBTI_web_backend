@@ -1,4 +1,5 @@
 var express = require("express");
+var moment = require("moment");
 const { send } = require("express/lib/response");
 var router = express.Router();
 
@@ -47,22 +48,62 @@ router.get("/:id", async function (req, res) {
     let sql = `select * from post where id = ${id}`;
 
     conn.query(sql, (err, rows, fields) => {
-
-      if(err) {
-        res.status(400).send({err})
+      if (err) {
+        res.status(400).send({ err });
         return 0;
-      }else{
-        res.send({post : rows});
+      } else {
+        res.send({ post: rows });
         let sql = `update post set views = views + 1 where id = ${id}`;
-        conn.query(sql,(err,rows,fields)=>{
-          if(err){
-            res.status(400).send({err})
+        conn.query(sql, (err, rows, fields) => {
+          if (err) {
+            res.status(400).send({ err });
             return 0;
-          }else{
-            console.log({views_update : { result: "성공" }});
+          } else {
+            console.log({ views_update: { result: "성공" } });
           }
         });
       }
+    });
+  } catch (err) {
+    res.status(400).send({ err });
+  }
+});
+
+router.get("/best/week", function (req, res) {
+  try {
+    // query들 가져오기
+    let search_type = req.query.search_type; //검색 타입
+    let search = req.query.search; //검색 내용
+    let per_page = req.query.per_page; //페이지당 표시할 내용 갯수
+    let page = req.query.page - 1; //페이지
+    let mbti = req.query.mbti.toLowerCase();
+    var datenow = moment().format("YYYY-MM-DD");
+    var datesub = moment().subtract(7, "d").format("YYYY-MM-DD");
+
+    let sql = `
+            select SQL_CALC_FOUND_ROWS *
+            from post
+            where board_name = "${mbti}"
+            AND created_at between "${datesub}" AND "${datenow}"
+            AND likes >= 10 
+            ${search ? `AND ${search_type} = '%${search}%'` : ""}
+            limit ${per_page * page},${per_page}
+        `;
+
+    conn.query(sql, (err, rows, fields) => {
+      if (err) {
+        res.status(400).send({ err });
+        return 0;
+      }
+
+      let posts = rows;
+
+      conn.query("SELECT FOUND_ROWS();", (err, rows, fields) => {
+        res.send({
+          data: posts,
+          count: rows[0]["FOUND_ROWS()"],
+        });
+      });
     });
   } catch (err) {
     res.status(400).send({ err });
