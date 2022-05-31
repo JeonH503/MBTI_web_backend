@@ -15,6 +15,9 @@ const commentRouter = require("./routes/comment.js");
 const postRouter = require("./routes/post.js");
 
 const helmet = require("helmet");
+const cors = require('cors');
+
+app.use(cors())
 
 app.use(helmet());
 app.use(cookieParser());
@@ -46,7 +49,7 @@ app.use(function (req, res, next) {
         }
     });
   } else if (
-        (req.method !== "GET" && req.path === '/accoint') ||
+        (req.method !== "GET" && req.path === '/account') ||
         req.method === "GET" || 
         req.path === "/login" || 
         (req.path === "/account" && req.method === "POST")
