@@ -15,6 +15,9 @@ const commentRouter = require("./routes/comment.js");
 const postRouter = require("./routes/post.js");
 
 const helmet = require("helmet");
+const cors = require('cors');
+
+app.use(cors())
 
 app.use(helmet());
 app.use(cookieParser());

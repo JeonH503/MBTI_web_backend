@@ -43,6 +43,27 @@ router.get("/", function (req, res) {
 
 router.get("/:id", async function (req, res) {
   try {
+    const id = req.params.id;
+    let sql = `select * from post where id = ${id}`;
+
+    conn.query(sql, (err, rows, fields) => {
+
+      if(err) {
+        res.status(400).send({err})
+        return 0;
+      }else{
+        res.send({post : rows});
+        let sql = `update post set views = views + 1`;
+        conn.query(sql,(err,rows,fields)=>{
+          if(err){
+            res.status(400).send({err})
+            return 0;
+          }else{
+            console.log({update : { result: "성공" }});
+          }
+        });
+      }
+    });
   } catch (err) {
     res.status(400).send({ err });
   }
