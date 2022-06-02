@@ -8,6 +8,7 @@ const connection = mysql.createConnection({
   user: conf.user,
   password: conf.password,
   database: conf.database,
+  multipleStatements: conf.multipleStatements,
 });
 
 module.exports = connection;

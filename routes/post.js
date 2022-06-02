@@ -162,13 +162,34 @@ router.patch("/like/:id", async function (req, res) {
   try {
     const id = req.params.id;
 
-    var sql = `update post set likes = likes+1 where id = ${id};`;
+    let account_id = req.body.account_id;
+
+    var sql = `SELECT EXISTS (SELECT * FROM likes WHERE account_id='${account_id}' AND post_id=${id}) AS success;`;
     conn.query(sql, function (err, rows, fields) {
       if (err) {
         res.status(400).send({ err });
         return 0;
       } else {
-        res.send({ patch: { result: "성공" } });
+        if (rows[0].success === 0) {
+          var sql =
+            `update post set likes = likes+1 where id = ${id};` +
+            `insert into likes values ('${account_id}', ${id});`;
+          var command = 0;
+        } else {
+          var sql =
+            `update post set likes = likes-1 where id = ${id};` +
+            `delete from likes where account_id='${account_id}' and post_id=${id};`;
+          var command = 1;
+        }
+        conn.query(sql, function (err, rows, fields) {
+          if (err) {
+            res.status(400).send({ err });
+            return 0;
+          } else {
+            if (command === 0) res.send({ like_press: { result: "성공" } });
+            if (command === 1) res.send({ like_cancel: { result: "성공" } });
+          }
+        });
       }
     });
   } catch (err) {
@@ -180,18 +201,16 @@ router.delete("/:id", async function (req, res) {
   try {
     const id = req.params.id;
 
-    let sql = `
-    delete
-    from post
-    where id = ${id}
-    `;
+    let sql =
+      `delete from likes where post_id = ${id};` +
+      `delete from post where id = ${id};`;
 
     conn.query(sql, (err, rows, fields) => {
       if (err) {
         res.status(400).send({ err });
+      } else {
+        res.status(200).send({ delete: { result: "성공" } });
       }
-
-      res.status(200).send({ msg: "ok" });
     });
   } catch (err) {
     res.status(400).send({ err });
