@@ -20,7 +20,6 @@ const cors = require('cors');
 
 //인증 미들웨어
 app.use(function (req, res, next) {
-  console.log("test")
   if (
     req.path !== "/login" &&
     req.headers.authorization &&
@@ -34,6 +33,7 @@ app.use(function (req, res, next) {
     jsonwebtoken.verify(token, "jjh", (err) => {
         if (err) {
                 res.status(401).json({ err: "유효하지 않는 토큰입니다." });
+                return 0;
         } else {
                 next();
         }

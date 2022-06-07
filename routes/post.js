@@ -121,6 +121,7 @@ router.post("/", function (req, res) {
     conn.query(sql, (err, rows, fields) => {
       if (err) {
         res.status(400).send({ err });
+        return 0;
       }
 
       res.status(200).send({ msg: "ok" });
@@ -148,6 +149,7 @@ router.patch("/:id", async function (req, res) {
     conn.query(sql, (err, rows, fields) => {
       if (err) {
         res.status(400).send({ err });
+        return 0;
       }
 
       res.status(200).send({ msg: "ok" });
@@ -208,6 +210,7 @@ router.delete("/:id", async function (req, res) {
     conn.query(sql, (err, rows, fields) => {
       if (err) {
         res.status(400).send({ err });
+        return 0;
       } else {
         res.status(200).send({ delete: { result: "성공" } });
       }
