@@ -25,20 +25,6 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// routes
-app.use("/account", accountRouter);
-app.use("/comment", commentRouter);
-app.use("/post", postRouter);
-
-// static 설정
-app.use('/uploads',express.static('./uploads'))
-
-// multer 설정
-const upload = multer({
-  dest:"uploads/images"
-})
-
-
 //인증 미들웨어
 app.use(function (req, res, next) {
   if (
@@ -72,6 +58,22 @@ app.use(function (req, res, next) {
     res.status(401).json({ err: "유효하지 않는 토큰입니다." });
   }
 });
+
+// routes
+app.use("/account", accountRouter);
+app.use("/comment", commentRouter);
+app.use("/post", postRouter);
+
+// static 설정
+app.use('/uploads',express.static('./uploads'))
+
+// multer 설정
+const upload = multer({
+  dest:"uploads/images"
+})
+
+
+
 
 //로그인
 app.post("/login", async function (req, res) {

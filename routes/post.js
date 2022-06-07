@@ -18,6 +18,7 @@ router.get("/", function (req, res) {
             select SQL_CALC_FOUND_ROWS *
             from post
             where board_name = "${mbti}"
+            order by created_at desc
             ${search ? `AND ${search_type} = '%${search}%'` : ""}
             limit ${per_page * page},${per_page}
         `;
