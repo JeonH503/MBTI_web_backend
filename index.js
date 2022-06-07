@@ -61,6 +61,7 @@ app.use(function (req, res, next) {
         (req.method !== "GET" && req.path === '/account') ||
         req.method === "GET" || 
         req.path === "/login" ||
+        req.path === "/post/best/week" ||
         (req.method === "GET" && req.path === '/uploads') ||
         (req.path === "/account" && req.method === "POST")
     ) {

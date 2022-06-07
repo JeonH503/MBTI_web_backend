@@ -15,6 +15,9 @@ router.get("/", function (req, res) {
     where post_id=${post_id}
     order by IF(ISNULL(parent_comment_id), id, parent_comment_id) 
     limit ${per_page * page},${per_page}`;
+
+    console.log(sql)
+
     conn.query(sql, function (err, rows, fields) {
       if (err) {
         res.status(400).send({ err });
@@ -63,9 +66,14 @@ router.post("/", function (req, res) {
     var post_id = req.body.post_id;
     var account_id = req.body.account_id;
     var description = req.body.description;
+    var parent_comment_id = req.body.parent_comment_id; 
     var created_at = req.body.created_at;
 
-    var sql = `insert into comment(post_id, account_id, description, created_at) values(${post_id}, '${account_id}', '${description}', now());`;
+    if(!parent_comment_id) {
+      parent_comment_id = null
+    }
+
+    var sql = `insert into comment(post_id, account_id, description, created_at, parent_comment_id) values(${post_id}, '${account_id}', '${description}', now(), ${parent_comment_id});`;
 
     conn.query(sql, (err, rows, fields) => {
       if (err) {
