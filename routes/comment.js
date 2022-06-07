@@ -16,8 +16,6 @@ router.get("/", function (req, res) {
     order by IF(ISNULL(parent_comment_id), id, parent_comment_id) 
     limit ${per_page * page},${per_page}`;
 
-    console.log(sql)
-
     conn.query(sql, function (err, rows, fields) {
       if (err) {
         res.status(400).send({ err });
@@ -62,12 +60,10 @@ router.get("/:id", async function (req, res) {
 
 router.post("/", function (req, res) {
   try {
-    const id = req.params.id;
     var post_id = req.body.post_id;
     var account_id = req.body.account_id;
     var description = req.body.description;
-    var parent_comment_id = req.body.parent_comment_id; 
-    var created_at = req.body.created_at;
+    var parent_comment_id = req.body.parent_comment_id;
 
     if(!parent_comment_id) {
       parent_comment_id = null
