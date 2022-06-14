@@ -10,10 +10,11 @@ router.get("/", function (req, res) {
     let post_id = req.query.post_id;
 
     var sql = `
-    select * 
-    from comment 
-    where post_id=${post_id}
-    order by IF(ISNULL(parent_comment_id), id, parent_comment_id) 
+    select c.id, a.mbti, c.post_id, c.account_id, c.description, c.created_at, c.parent_comment_id, c.depth
+    from comment c
+    join account a on a.id = c.account_id
+    where c.post_id=${post_id}
+    order by IF(ISNULL(c.parent_comment_id), c.id, c.parent_comment_id) 
     limit ${per_page * page},${per_page}`;
 
     conn.query(sql, function (err, rows, fields) {
